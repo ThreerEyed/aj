@@ -1,3 +1,12 @@
+
 $(document).ready(function(){
-    $(".auth-warn").show();
-})
+    $.get('/house/myhouses/', function (data) {
+        if(!data.msg.id_name) {
+            $(".auth-warn").show();
+            $('#houses-list').hide()
+        }else{
+            $(".auth-warn").hide();
+            $('#houses-list').show()
+        }
+    });
+});

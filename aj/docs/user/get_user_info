@@ -1,0 +1,19 @@
+
+
+### 请求
+
+    GET  /user/user
+
+### 参数
+
+
+### 响应
+{
+"code": "200",
+    "user_info": {
+        "avatar": "mm.jpg",
+        "id": 3,
+        "name": "\u5c0f\u9ec4",
+        "phone": "15512341234"
+    }
+}

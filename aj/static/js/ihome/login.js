@@ -24,5 +24,27 @@ $(document).ready(function() {
             $("#password-err").show();
             return;
         }
+        $.ajax({
+            url: '/user/login/',
+            type: 'POST',
+            dataType: 'json',
+            data: {'mobile': mobile, 'password': passwd},
+            success: function (msg) {
+                if(msg.code==200){
+                    location.href='/user/my/'
+                }
+                if(msg.code==1006){
+                    $('#mobile-err span').html(msg.msg);
+                    $("#mobile-err").show();
+                }
+                if(msg.code==1005){
+                    $('#password-err span').html(msg.msg);
+                    $("#password-err").show();
+                }
+            },
+            error: function (msg) {
+                alert('请求失败')
+            }
+        })
     });
 })

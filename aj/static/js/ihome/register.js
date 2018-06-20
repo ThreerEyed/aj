@@ -30,13 +30,13 @@ function sendSMSCode() {
         $(".phonecode-a").attr("onclick", "sendSMSCode();");
         return;
     } 
-    var imageCode = $("#imagecode").val();
-    if (!imageCode) {
-        $("#image-code-err span").html("请填写验证码！");
-        $("#image-code-err").show();
-        $(".phonecode-a").attr("onclick", "sendSMSCode();");
-        return;
-    }
+    // var imageCode = $("#imagecode").val();
+    // if (!imageCode) {
+    //     $("#image-code-err span").html("请填写验证码！");
+    //     $("#image-code-err").show();
+    //     $(".phonecode-a").attr("onclick", "sendSMSCode();");
+    //     return;
+    // }
     $.get("/api/smscode", {mobile:mobile, code:imageCode, codeId:imageCodeId}, 
         function(data){
             if (0 != data.errno) {
@@ -64,13 +64,13 @@ function sendSMSCode() {
 }
 
 $(document).ready(function() {
-    generateImageCode();
+    // generateImageCode();
     $("#mobile").focus(function(){
         $("#mobile-err").hide();
     });
-    $("#imagecode").focus(function(){
-        $("#image-code-err").hide();
-    });
+    // $("#imagecode").focus(function(){
+    //     $("#image-code-err").hide();
+    // });
     $("#phonecode").focus(function(){
         $("#phone-code-err").hide();
     });
@@ -84,7 +84,7 @@ $(document).ready(function() {
     $(".form-register").submit(function(e){
         e.preventDefault();
         mobile = $("#mobile").val();
-        phoneCode = $("#phonecode").val();
+        // phoneCode = $("#phonecode").val();
         passwd = $("#password").val();
         passwd2 = $("#password2").val();
         if (!mobile) {
@@ -92,11 +92,11 @@ $(document).ready(function() {
             $("#mobile-err").show();
             return;
         } 
-        if (!phoneCode) {
-            $("#phone-code-err span").html("请填写短信验证码！");
-            $("#phone-code-err").show();
-            return;
-        }
+        // if (!phoneCode) {
+        //     $("#phone-code-err span").html("请填写短信验证码！");
+        //     $("#phone-code-err").show();
+        //     return;
+        // }
         if (!passwd) {
             $("#password-err span").html("请填写密码!");
             $("#password-err").show();
@@ -107,5 +107,31 @@ $(document).ready(function() {
             $("#password2-err").show();
             return;
         }
+        $.ajax({
+            url: '/user/register/',
+            dataType: 'json',
+            type: 'POST',
+            data: {'mobile': mobile, 'password': passwd, 'password2': passwd2},
+            success: function (msg) {
+                if(msg.code==200){
+                    location.href='/user/login/'
+                }
+                if(msg.code==1002){
+                    $("#mobile-err span").html(msg.msg);
+                    $("#mobile-err").show();
+                }
+                if(msg.code==1003){
+                    $("#password-err span").html(msg.msg);
+                    $("#password-err").show();
+                }
+                if(msg.code==1004){
+                    $("#password2-err span").html(msg.msg);
+                    $("#password2-err").show();
+                }
+            },
+            error:function (msg) {
+              alert('请求失败')
+            }
+        });
     });
 })
