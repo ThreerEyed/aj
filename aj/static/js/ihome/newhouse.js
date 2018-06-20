@@ -25,3 +25,19 @@ $(document).ready(function(){
         $('.house-facility-list').html(facilitys_str)
     })
 });
+
+$('#form-house-info').submit(function () {
+    $('.error-msg text-center').hide();
+    //验证内容是否填写
+    alert($(this).serialize())
+    $.post('/house/newhouses/',$(this).serialize(),function (data) {
+        if(data.code== '200'){
+            $('#form-house-info').hide();
+            $('#form-house-image').show();
+            $('#house-id').val(data.house_id);
+        }else{
+            $('.error-msg text-center').show().find('span').html(ret_map[data.code]);
+        }
+    });
+    return false;
+});
