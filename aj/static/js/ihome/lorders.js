@@ -25,4 +25,8 @@ $(document).ready(function(){
         var orderId = $(this).parents("li").attr("order-id");
         $(".modal-reject").attr("order-id", orderId);
     });
+
+    $.get('/order/renter_lorders/', function (data) {
+
+    })
 });

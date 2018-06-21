@@ -40,10 +40,26 @@ $(document).ready(function(){
         } else {
             var sd = new Date(startDate);
             var ed = new Date(endDate);
-            days = (ed - sd)/(1000*3600*24) + 1;
+            days = (ed - sd)/(1000*3600*24);
             var price = $(".house-text>p>span").html();
             var amount = days * parseFloat(price);
             $(".order-amount>span").html(amount.toFixed(2) + "(共"+ days +"晚)");
         }
     });
-})
+    var house_id = location.search.split('=')[1];
+    $.get('/order/bookings/'+ house_id + '/', function (data) {
+        $('.nav-btn').attr('href', '/house/detail/?house_id='+ house_id);
+        $('.house-info img').attr('src', data.house.index_image_url);
+        $('.house-text p span').html(data.house.price);
+        $('.house-text h3').html('房屋标题 :' + data.house.title);
+    });
+    $('.submit-btn').on('click', function () {
+        var startDate = $("#start-date").val();
+        var endDate = $("#end-date").val();
+        $.post('/order/bookings/'+ house_id + '/',{'start_date': startDate, 'end_date': endDate} ,function (data) {
+            location.href = '/order/lorders/';
+        })
+    })
+
+});
+

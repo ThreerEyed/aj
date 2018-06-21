@@ -5,6 +5,7 @@ from flask import Flask
 from flask_session import Session
 
 from App.house_views import house_blueprint
+from App.order_views import order_blueprint
 from App.views import user_blueprint, db
 
 se = Session()
@@ -21,6 +22,7 @@ def create_app():
 
     app.register_blueprint(blueprint=user_blueprint, url_prefix='/user')
     app.register_blueprint(blueprint=house_blueprint, url_prefix='/house')
+    app.register_blueprint(blueprint=order_blueprint, url_prefix='/order')
 
     # 数据库配置
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:123456@localhost:3306/aj'

@@ -115,14 +115,15 @@ class House(BaseModel, db.Model):
             # 'avatar':current_app.config['QINIU_URL']+self.user.avatar if self.user.avatar else '',
             'room':self.room_count,
             'order_count':self.order_count,
+            # 'image': self.index_image_url,
             'address':self.address
         }
 
     def to_full_dict(self):
         return {
             'id':self.id,
-            'user_avatar':self.user.avatar if self.user.avatar else '',
-            'user_name':self.user.name,
+            # 'user_avatar':self.user.avatar if self.user.avatar else '',
+            # 'user_name':self.user.name,
             'title': self.title,
             'price':self.price,
             'address':self.area.name+self.address,
@@ -137,6 +138,7 @@ class House(BaseModel, db.Model):
             'order_count':self.order_count,
             'images':[image.url for image in self.images],
             'facilities':[facility.to_dict() for facility in self.facilities],
+            'index_image_url': self.index_image_url,
         }
 
 

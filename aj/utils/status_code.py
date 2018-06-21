@@ -18,4 +18,6 @@ USER_NAME_EXISTS = {'code': '1008', 'msg': '该用户名已存在'}
 USER_AUTH_DATA_IS_NULL = {'code': '1009', 'msg': '实名认证不能为空'}
 USER_AUTH_ID_CARD_IS_INVALID = {'code': '1010', 'msg': '身份证号码无效'}
 
-# 登录
+
+# 订单
+ORDER_DATE_IS_INVALID = {'code': '1201', 'msg': '无效的日期'}

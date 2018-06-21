@@ -29,15 +29,31 @@ $(document).ready(function(){
 $('#form-house-info').submit(function () {
     $('.error-msg text-center').hide();
     //验证内容是否填写
-    alert($(this).serialize())
     $.post('/house/newhouses/',$(this).serialize(),function (data) {
         if(data.code== '200'){
             $('#form-house-info').hide();
             $('#form-house-image').show();
-            $('#house-id').val(data.house_id);
+            $('#house-id').val(data.msg);
         }else{
-            $('.error-msg text-center').show().find('span').html(ret_map[data.code]);
+            $('.error-msg text-center').show()
         }
     });
     return false;
+});
+
+
+$('#form-house-image').submit(function () {
+    $(this).ajaxSubmit({
+        url: '/house/house_img/',
+        type: 'post',
+        dataType: 'json',
+        success: function (data) {
+            var img_url = '<img src='+ data.image_url + '>';
+            $('.house-image-cons').append(img_url)
+        },
+        error:function (data) {
+            alert('添加失败')
+        }
+    })
+    return false
 });
