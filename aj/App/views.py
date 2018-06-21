@@ -118,6 +118,7 @@ def user_logout():
 
 # 首页
 @user_blueprint.route('/index/', methods=['GET', 'POST'])
+@is_login
 def index():
     if request.method == 'GET':
         return render_template('index.html')
@@ -135,7 +136,10 @@ def my():
 @is_login
 def user_info():
     user = User.query.filter_by(id=session['user_id']).first()
-    return jsonify({'code': '200', 'user_info': user.to_basic_dict()})
+    if user:
+        return jsonify({'code': '200', 'user_info': user.to_basic_dict()})
+    else:
+        return jsonify(status_code.USER_NOT_LOGIN_ERROR)
 
 
 # 我的订单

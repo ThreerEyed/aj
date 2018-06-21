@@ -1,7 +1,7 @@
 
 $(document).ready(function(){
     $.get('/house/myhouses/', function (data) {
-        if(data.code == '200'){
+        if(data.user.id_card){
             $(".auth-warn").hide();
 
             var myhouses_str = '';
@@ -18,6 +18,9 @@ $(document).ready(function(){
                 myhouses_str += '</li></ul></div></div></a></li>'
             }
             $('#houses-list').append(myhouses_str).show();
+        }else{
+            $(".auth-warn").show();
+            $('#houses-list').hide();
         }
     });
 });

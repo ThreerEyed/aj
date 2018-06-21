@@ -2,6 +2,8 @@ from functools import wraps
 
 from flask import session, redirect, url_for
 
+from App.models import User
+
 
 def is_login(func):
     @wraps(func)

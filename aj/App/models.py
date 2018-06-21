@@ -201,15 +201,22 @@ class Order(BaseModel,db.Model):
     amount = db.Column(db.Integer, nullable=False)  # 总价格
     status = db.Column(
         db.Enum(
-            "WAIT_ACCEPT",  # 待接单,
-            "WAIT_PAYMENT",  # 待支付
-            "PAID",  # 已支付
-            "WAIT_COMMENT",  # 待评价
-            "COMPLETE",  # 已完成
-            "CANCELED",  # 已取消
-            "REJECTED"  # 已拒单
+            # "WAIT_ACCEPT",  # 待接单,
+            # "WAIT_PAYMENT",  # 待支付
+            # "PAID",  # 已支付
+            # "WAIT_COMMENT",  # 待评价
+            # "COMPLETE",  # 已完成
+            # "CANCELED",  # 已取消
+            # "REJECTED"  # 已拒单
+            "待接单",  # 待接单,
+            "待支付",  # 待支付
+            "已支付",  # 已支付
+            "待评价",  # 待评价
+            "已完成",  # 已完成
+            "已取消",  # 已取消
+            "已拒单"  # 已拒单
         ),
-        default="WAIT_ACCEPT", index=True)
+        default="待接单", index=True)
     comment = db.Column(db.Text)  # 评论
 
     def to_dict(self):

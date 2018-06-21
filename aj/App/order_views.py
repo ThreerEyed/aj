@@ -67,4 +67,12 @@ def lorders():
 # 房东的所有订单
 @order_blueprint.route('/renter_lorders/', methods=['GET'])
 def renter_lorders():
-    return jsonify({'code': '200'})
+    houses = House.query.filter_by(user_id=session['user_id']).all()
+    houses_id = []
+    for house in houses:
+        a = house.id
+        houses_id.append(a)
+    orders = Order.query.filter(Order.house_id.in_(houses_id)).all()
+    order = [order.to_dict() for order in orders]
+
+    return jsonify({'code': '200', 'order': order})
