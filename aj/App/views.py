@@ -124,6 +124,13 @@ def index():
         return render_template('index.html')
 
 
+# 搜索
+@user_blueprint.route('/search/', methods=['GET'])
+def search():
+    if request.method == 'GET':
+        return render_template('search.html')
+
+
 @user_blueprint.route('/user_index/', methods=['GET'])
 @is_login
 def user_index():
