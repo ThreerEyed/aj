@@ -84,4 +84,36 @@ $(document).ready(function(){
         var date = $(this).datepicker("getFormattedDate");
         $("#start-date-input").val(date);
     });
-})
+    $.get('/user/user_index/', function (data) {
+        if(data.user.name){
+            $('.register-login').hide();
+            $('.user-info').show();
+            $('.user-name').html(data.user.name)
+        }else{
+            $('.register-login').show();
+            $('.user-info').hide();
+        }
+        if(data.code == '200'){
+            var index_html = template('index_html_temp', {'houses': data.houses});
+            $('.swiper-container').html(index_html);
+        }
+        // $(".top-bar>.register-login").show();
+        var mySwiper = new Swiper ('.swiper-container', {
+            loop: true,
+            autoplay: 2000,
+            autoplayDisableOnInteraction: false,
+            pagination: '.swiper-pagination',
+            paginationClickable: true
+        });
+    });
+    $.get('/house/newhouses/', function (data) {
+        var area_html = template('area_temp_list', {'areas': data.all_area});
+        $('.area-list').html(area_html);
+        $(".area-list a").click(function(e){
+            $("#area-btn").html($(this).html());
+            $(".search-btn").attr("area-id", $(this).attr("area-id"));
+            $(".search-btn").attr("area-name", $(this).html());
+            $("#area-modal").modal("hide");
+        });
+    })
+});

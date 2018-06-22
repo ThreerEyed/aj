@@ -21,4 +21,10 @@ $(document).ready(function(){
         var orderId = $(this).parents("li").attr("order-id");
         $(".modal-comment").attr("order-id", orderId);
     });
+    $.get('/order/my_orders/', function (data) {
+        if(data.code == '200'){
+            var order_html = template('orders-list-tmpl', {'order': data.order});
+            $('.orders-list').html(order_html)
+        }
+    })
 });

@@ -23,44 +23,58 @@
         <div class="orders-con">
             <ul class="orders-list">
             </ul>
+            {% raw %}
             <script id="orders-list-tmpl" type="text/html">
-                <li>
+                {{ if order }}
+                {{ each order as user_order }}
+                <li order-id={{ user_order.order_id }}>
                     <div class="order-title">
-                        <h3>订单编号</h3>
+                        <h3>订单编号: {{ user_order.order_id }}</h3>
+                        {{ if '' == order.status }}
                         <div class="fr order-operate">
                             <button type="button" class="btn btn-success order-comment" data-toggle="modal" data-target="#comment-modal">发表评价</button>
                         </div>
+                        {{ /if }}
                     </div>
                     <div class="order-content">
-                        <img src="">
+                        <img src="{{ user_order.image }}">
                         <div class="order-text">
-                            <h3></h3>
+                            <h3>{{ user_order.title }}</h3>
                             <ul>
-                                <li>创建时间：</li>
-                                <li>入住日期：</li>
-                                <li>离开日期：</li>
-                                <li>合计金额：￥(共晚)</li>
+                                <li>创建时间：{{ user_order.create_date }}</li>
+                                <li>入住日期：{{ user_order.begin_date }}</li>
+                                <li>离开日期：{{ user_order.end_date }}</li>
+                                <li>合计金额：￥{{ user_order.amount }}(共晚)</li>
                                 <li>订单状态：
                                     <span>
+                                        {{ if '待接单' == user_order.status }}
                                             待接单
+                                        {{ else if '已支付' == user_order.status }}
+                                            已支付
+                                        {{ else if '待评价' == user_order.status }}
                                             待评价
+                                        {{ else if '已完成' == user_order.status }}
                                             已完成
+                                        {{ else if '已拒单' == user_order.status }}
                                             已拒单
+                                        {{ /if }}
                                     </span>
                                 </li>
-
-                                <li>我的评价： </li>
-                                <li>拒单原因： </li>
-
+                                {{ if '已支付' == user_order.status }}
+                                <li>我的评价： {{ user_order.comment }}</li>
+                                {{ else if '已拒单' == user_order.status }}
+                                <li>拒单原因： {{ user_order.comment }}</li>
+                                {{ /if }}
                             </ul>
                         </div>
                     </div>
                 </li>
-
-
+                {{ /each }}
+                {{ else }}
                 暂时没有订单。
-
+                {{ /if }}
             </script>
+            {% endraw %}
             <div class="modal fade" id="comment-modal" tabindex="-1" role="dialog" aria-labelledby="comment-label">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -81,7 +95,7 @@
         </div>
         <div class="footer">
             <p><span><i class="fa fa-copyright"></i></span>爱家租房&nbsp;&nbsp;享受家的温馨</p>
-        </div> 
+        </div>
     </div>
     
     <script src="/static/js/jquery.min.js"></script>

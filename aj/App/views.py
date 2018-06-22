@@ -4,7 +4,7 @@ import re
 from flask import Blueprint, request, render_template, redirect, url_for, session, jsonify
 from werkzeug.utils import secure_filename
 
-from App.models import User, db
+from App.models import User, db, House
 from utils import status_code
 from utils.decorator import is_login
 
@@ -117,11 +117,21 @@ def user_logout():
 
 
 # 首页
-@user_blueprint.route('/index/', methods=['GET', 'POST'])
+@user_blueprint.route('/index/', methods=['GET'])
 @is_login
 def index():
     if request.method == 'GET':
         return render_template('index.html')
+
+
+@user_blueprint.route('/user_index/', methods=['GET'])
+@is_login
+def user_index():
+    house_list = House.query.all()
+    houses = [house.to_dict() for house in house_list]
+    if session['user_id']:
+        user = User.query.filter_by(id=session['user_id']).first()
+    return jsonify({'code': '200', 'houses': houses, 'user': user.to_basic_dict()})
 
 
 # 个人中心

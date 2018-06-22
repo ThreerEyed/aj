@@ -52,9 +52,18 @@ def orders():
     return render_template('orders.html')
 
 
+# 我的订单接口
+@order_blueprint.route('/my_orders/', methods=['GET'])
+def my_orders():
+    orders = Order.query.filter_by(user_id=session['user_id']).all()
+    order = [order.to_dict() for order in orders]
+    return jsonify({'code': '200', 'order': order})
+
+
 # 租客的所有订单
 @order_blueprint.route('/lorders/', methods=['GET'])
 def lorders():
+
     return render_template('lorders.html')
 
 
@@ -76,3 +85,21 @@ def renter_lorders():
     order = [order.to_dict() for order in orders]
 
     return jsonify({'code': '200', 'order': order})
+
+
+# 订单处理
+@order_blueprint.route('/orders/', methods=['PATCH'])
+def change_order_status():
+    status = request.form.get('status')
+    order_id = request.form.get('order_id')
+    order = Order.query.filter_by(id=order_id).first()
+    order.status = status
+    if status == '已拒单':
+        comment = request.form.get('reject_reason')
+        order.comment = comment
+    try:
+        order.add_update()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(status_code.DATABASE_ERROR)
+    return jsonify({'code': '200', 'order': order.to_dict() })

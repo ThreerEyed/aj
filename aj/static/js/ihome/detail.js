@@ -38,6 +38,7 @@ $(document).ready(function () {
                 image_str += '></li>';
             }
             $('.swiper-wrapper').append(image_str);
+            $('.house-price span').html(data.house.price);
             $('.house-title').html(data.house.title);
             $('.landlord-pic img').attr('src', '/static/upload/' + data.user.avatar);
             $('.landlord-name span').html(data.user.name);
@@ -45,7 +46,7 @@ $(document).ready(function () {
             $('#house_rent_count').html('出租' + data.house.room_count + '间');
             $('#house_rent_acreage').html('房屋面积 :' + data.house.acreage + '平米');
             $('#house_rent_type').html('房屋户型 :' + data.house.unit);
-            $('#livable_number').html(data.house.capacity);
+            $('#livable_number').html('宜居人数 :' + data.house.capacity);
             $('#beds').html(data.house.beds);
             $('#atleast_days').html(data.house.min_days);
             $('#most_days').html(data.house.max_days);

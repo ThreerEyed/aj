@@ -17,27 +17,25 @@ function getCookie(name) {
 $(document).ready(function(){
     $('.modal').on('show.bs.modal', centerModals);      //当模态框出现的时候
     $(window).on('resize', centerModals);
-    $(".order-accept").on("click", function(){
-        var orderId = $(this).parents("li").attr("order-id");
-        $(".modal-accept").attr("order-id", orderId);
-    });
-    $(".order-reject").on("click", function(){
-        var orderId = $(this).parents("li").attr("order-id");
-        $(".modal-reject").attr("order-id", orderId);
-    });
+
 
     $.get('/order/renter_lorders/', function (data) {
         var lorder_str = '';
         console.log(data.order[0].create_date);
         for(var i = 0; i < data.order.length; i++){
-            lorder_str += '<li><div class="order-title"><h3>订单编号：';
+            lorder_str += '<li order-id=';
             lorder_str += data.order[i].order_id;
-            lorder_str += '</h3><div class="fr order-operate"><button type="button" ' +
-                            'class="btn btn-success order-accept" data-toggle="modal" ' +
-                            'data-target="#accept-modal">接单</button><button type="button" ' +
-                            'class="btn btn-danger order-reject" data-toggle="modal" ' +
-                            'data-target="#reject-modal">拒单</button></div></div><div ' +
-                            'class="order-content"><img src=';
+            lorder_str += '><div class="order-title"><h3>订单编号：';
+            lorder_str += data.order[i].order_id;
+            lorder_str += '</h3>';
+            if(data.order[i].status == '待接单') {
+                lorder_str += '<div class="fr order-operate"><button type="button" ' +
+                    'class="btn btn-success order-accept" data-toggle="modal" ' +
+                    'data-target="#accept-modal">接单</button><button type="button" ' +
+                    'class="btn btn-danger order-reject" data-toggle="modal" ' +
+                    'data-target="#reject-modal">拒单</button></div>';
+            }
+            lorder_str += '</div><div class="order-content"><img src=';
             lorder_str += data.order[i].image;
             lorder_str += '><div class="order-text"><h3>';
             lorder_str += data.order[i].house_title;
@@ -58,5 +56,45 @@ $(document).ready(function(){
             lorder_str += '</li></ul></div></div></li>';
         }
         $('.orders-list').append(lorder_str);
-    })
+        $(".order-accept").on("click", function(){
+        var orderId = $(this).parents("li").attr("order-id");
+            $(".modal-accept").attr("order-id", orderId);
+        });
+        $(".order-reject").on("click", function(){
+            var orderId = $(this).parents("li").attr("order-id");
+            $(".modal-reject").attr("order-id", orderId);
+        });
+
+    });
+    $('.modal-accept').on('click', function () {
+        var orderId = $('.modal-accept').attr("order-id");
+        var status = '已支付';
+        $.ajax({
+            url: '/order/orders/',
+            type: 'PATCH',
+            dataType: 'json',
+            data: {'order_id': orderId, 'status': status},
+            success: function (data) {
+                location.href = '/order/lorders/'
+            },
+            error: function (data) {
+            }
+        })
+    });
+    $('.modal-reject').on('click', function () {
+        var orderId = $('.modal-reject').attr("order-id");
+        var status = '已拒单';
+        var reject_reason = $('#reject-reason').val();
+        $.ajax({
+            url: '/order/orders/',
+            type: 'PATCH',
+            dataType: 'json',
+            data: {'order_id': orderId, 'status': status, 'reject_reason': reject_reason},
+            success: function (data) {
+            },
+            error: function (data) {
+            }
+        })
+    });
+
 });
