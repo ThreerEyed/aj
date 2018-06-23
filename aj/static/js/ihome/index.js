@@ -59,13 +59,13 @@ function goToSearchPage(th) {
 
 $(document).ready(function(){
     $(".top-bar>.register-login").show();
-    var mySwiper = new Swiper ('.swiper-container', {
-        loop: true,
-        autoplay: 2000,
-        autoplayDisableOnInteraction: false,
-        pagination: '.swiper-pagination',
-        paginationClickable: true
-    }); 
+    // var mySwiper = new Swiper ('.swiper-container', {
+    //     loop: true,
+    //     autoplay: 2000,
+    //     autoplayDisableOnInteraction: false,
+    //     pagination: '.swiper-pagination',
+    //     paginationClickable: true
+    // });
     $(".area-list a").click(function(e){
         $("#area-btn").html($(this).html());
         $(".search-btn").attr("area-id", $(this).attr("area-id"));
@@ -95,24 +95,26 @@ $(document).ready(function(){
         }
         if(data.code == '200'){
             var index_html = template('index_html_temp', {'houses': data.houses});
-            $('.swiper-container').html(index_html);
+            $('.swiper-wrapper').html(index_html);
+
+            var mySwiper = new Swiper ('.swiper-container', {
+                loop: true,
+                autoplay: 2000,
+                autoplayDisableOnInteraction: false,
+                pagination: '.swiper-pagination',
+                paginationClickable: true
+            });
         }
         // $(".top-bar>.register-login").show();
-        var mySwiper = new Swiper ('.swiper-container', {
-            loop: true,
-            autoplay: 2000,
-            autoplayDisableOnInteraction: false,
-            pagination: '.swiper-pagination',
-            paginationClickable: true
-        });
+
     });
     $.get('/house/newhouses/', function (data) {
         var area_html = template('area_temp_list', {'areas': data.all_area});
         $('.area-list').html(area_html);
         $(".area-list a").click(function(e){
             $("#area-btn").html($(this).html());
-            $(".search-btn").attr("area-id", $(this).attr("area-id"));
-            $(".search-btn").attr("area-name", $(this).html());
+            $(".search-btn").attr("area-id", $(this).attr("area-id"), "area_name", $(this).html());
+            // $(".search-btn").attr("area-name", $(this).html());
             $("#area-modal").modal("hide");
         });
     })

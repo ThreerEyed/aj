@@ -131,6 +131,13 @@ def search():
         return render_template('search.html')
 
 
+# 搜索接口
+@user_blueprint.route('/index_search/', methods=['GET'])
+def index_search():
+
+    return jsonify()
+
+
 @user_blueprint.route('/user_index/', methods=['GET'])
 @is_login
 def user_index():
