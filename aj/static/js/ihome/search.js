@@ -161,4 +161,35 @@ $(document).ready(function(){
             $(".filter-title-bar>.filter-title").eq(2).children("span").eq(0).html($(this).html());
         }
     })
-})
+});
+
+
+$(document).ready(function(){
+    var path = location.search;
+//    var a_id = path.split('&')[0].split('=')
+//    var sd = location.search.split('&')[2].split('=')[1]
+//    var ed = location.search.split('&')[3].split('=')[1]
+
+    $.get('/house/searchall/' + path, function(data){
+
+        if(data.code == '200'){
+            var house_htmls = '';
+            for(var i=0; i<data.houses.length; i++){
+                var house_html = '<li class="house-item">';
+                house_html += '<a href="/house/detail/?id=' + data.houses[i].id +'"><img src="'+ data.houses[i].image + '"></a>'
+                house_html += '<div class="house-desc">';
+                house_html += '<div class="landlord-pic"><img src="/static/images/landlord01.jgp"></div>';
+                house_html += '<div class="house-price">￥<span>' + data.houses[i].price  + '</span>/晚</div>';
+                house_html += '<div class="house-intro">';
+                house_html += '<span class="house-title">' + data.houses[i].title + '</span>';
+                house_html += '<em>出租' + data.houses[i].room + '间 - ' + data.houses[i].address + '</em>';
+                house_html += ' </div> </div> </li>';
+                house_htmls += house_html
+            }
+            $('.house-list').html(house_htmls);
+
+            var filter_area = template('filter_area_list',{areas:data.areas});
+            $('.filter-area').html(filter_area)
+        }
+    });
+});

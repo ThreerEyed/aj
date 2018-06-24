@@ -44,7 +44,8 @@ function setEndDate() {
 }
 
 function goToSearchPage(th) {
-    var url = "/search.html?";
+    // var url = "/search.html?";
+    var url = "/user/search/?";
     url += ("aid=" + $(th).attr("area-id"));
     url += "&";
     var areaName = $(th).attr("area-name");
@@ -54,6 +55,8 @@ function goToSearchPage(th) {
     url += ("sd=" + $(th).attr("start-date"));
     url += "&";
     url += ("ed=" + $(th).attr("end-date"));
+    // location.href = url;
+    alert(url);
     location.href = url;
 }
 

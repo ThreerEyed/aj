@@ -4,7 +4,7 @@ import re
 from flask import Blueprint, request, render_template, redirect, url_for, session, jsonify
 from werkzeug.utils import secure_filename
 
-from App.models import User, db, House
+from App.models import User, db, House, Order, Area
 from utils import status_code
 from utils.decorator import is_login
 
@@ -127,8 +127,61 @@ def index():
 # 搜索
 @user_blueprint.route('/search/', methods=['GET'])
 def search():
-    if request.method == 'GET':
-        return render_template('search.html')
+
+    return render_template('search.html')
+
+
+# 搜索接口
+@user_blueprint.route('/user_search/', methods=['GET'])
+def user_search():
+    sort_key = request.args.get('sk')
+    a_id = request.args.get('aid')
+    begin_date = request.args.get('sd')
+    end_date = request.args.get('ed')
+    area_name = request.args.get('aname')
+
+
+    houses = House.query.filter_by(area_id=a_id)
+    # 不能查询自己发布的房源，排除当前用户发布的房屋
+    if 'user_id' in session:
+        hlist = houses.filter(House.user_id != (session['user_id']))
+
+    # 满足时间条件，查询入住时间和退房时间在首页选择时间内的房间，并排除掉这些房间
+    order_list = Order.query.filter(Order.status != 'REJECTED')
+    # 情况一：
+    order_list1 = Order.query.filter(Order.begin_date >= begin_date, Order.end_date <= end_date)
+    # 情况二：
+    order_list2 = order_list.filter(Order.begin_date < begin_date, Order.end_date > end_date)
+    # 情况三：
+    order_list3 = order_list.filter(Order.end_date >= begin_date, Order.end_date <= end_date)
+    # 情况四：
+    order_list4 = order_list.filter(Order.begin_date >= begin_date, Order.begin_date <= end_date)
+    # 获取订单中的房屋编号
+    house_ids = [order.house_id for order in order_list2]
+    for order in order_list3:
+        house_ids.append(order.house_id)
+    for order in order_list4:
+        if order.house_id not in house_ids:
+            house_ids.append(order.house_id)
+    # 查询排除入住时间和离店时间在预约订单内的房屋信息
+    hlist = hlist.filter(House.id.notin_(house_ids))
+
+    # 排序规则,默认根据最新排列
+    sort = House.id.desc()
+    if sort_key == 'booking':
+        sort = House.order_count.desc()
+    elif sort_key == 'price-inc':
+        sort = House.price.asc()
+    elif sort_key == 'price-des':
+        sort = House.price.desc()
+    hlist = hlist.order_by(sort)
+    hlist = [house.to_dict() for house in hlist]
+
+    # 获取区域信息
+    area_list = Area.query.all()
+    area_dict_list = [area.to_dict() for area in area_list]
+
+    return jsonify(code=status_code.OK, houses=hlist, areas=area_dict_list)
 
 
 @user_blueprint.route('/user_index/', methods=['GET'])
