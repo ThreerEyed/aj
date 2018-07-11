@@ -1,0 +1,412 @@
+1/生成图片验证码
+请求方法:GET
+请求URL:/api/v1.0/imagecode/<image_code_id>
+数据格式:Content-Type = 'image/jpg';
+   示例:
+   使用响应对象
+   resp = make_response(image)
+   resp.set_cookie('user','python2')
+   resp.headers['Content-Type'] = 'image/jpg'
+
+请求参数:
+参数名         是否必须        参数描述
+image_code_id    是          图片验证码的编号(扩展名)
+
+返回结果:
+正确:
+返回图片使用make_response对象返回
+
+错误:
+{
+    errno=RET.DBERR,
+    errmsg='保存图片验证码失败'
+}
+
+2/发送短信验证码
+请求方法:GET
+请求URL:/api/v1.0/smscode/<mobile>,text=image_code,id=image_code_id
+
+数据格式:json
+请求参数:
+参数名         是否必须        参数说明
+mobile          是           用户输入的手机号
+text            是           用户输入的图片验证码内容
+id              是           图片验证码编号
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='发送成功'
+}
+
+错误:
+{
+    errno=RET.THIRDERR,
+    errmsg='发送失败'
+}
+
+
+3/注册
+请求方法:POST
+请求URL:/api/v1.0/users
+数据格式:json
+请求参数:
+参数名         是否必须        参数说明
+mobile          是           用户输入的手机号
+sms_code        是           用户输入的短信验证码
+password        是           用户输入的密码
+
+返回结果:data = user.to_dict()
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data=user.to_dict()
+}
+
+错误:
+{
+    errno=RET.DATAERR,
+    errmsg='数据错误'
+}
+
+4/登陆
+请求方法:POST
+请求URL:/api/v1.0/sessions
+数据格式:json
+请求参数:
+参数名         是否必须        参数说明
+mobile          是           用户登陆输入的手机号
+password        是           用户登陆输入的密码
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data={'user_id':user.id}
+}
+错误:
+{
+    errno=RET.DATAERR,
+    errmsg='手机号或密码错误'
+}
+
+5/退出登陆
+请求方法:DELETE
+请求URL:/api/v1.0/session
+数据格式:json
+请求参数:登陆验证装饰器,user_id = g.user_id
+
+返回结果:
+{
+    errno=RET.OK,
+    errmsg='OK'
+}
+
+
+6/设置用户头像
+请求方法:POST
+请求URL:/api/v1.0/user/avatar
+数据格式:json
+请求参数:
+参数名         是否必须        参数描述
+avatar          是           用户上传的头像文件
+user_id         是           用户的id
+
+返回结果:七牛云的空间外链域名 + 七牛云返回的图片文件名称(相对路径)
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data={'avatar_url':image_url}
+}
+
+错误:
+{
+    errno=RET.THIRDERR,
+    errmsg='七牛云上传图片失败'
+}
+
+7/修改用户信息
+请求方法:PUT
+请求URL:/api/v1.0/user/name
+数据格式:json
+请求参数:
+参数名         是否必须        参数描述
+name            是           用户输入的昵称(用户名)
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK,
+    data={'name':name}
+}
+
+错误:
+{
+    errno=RET.DBERR,
+    errmsg='更新用户名信息异常'
+}
+
+
+8/获取用户信息
+请求方法:GET
+请求URL:/api/v1.0/user
+数据格式:json
+请求参数:登陆验证装饰器,user_id = g.user_id
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data=user.to_dict()
+}
+错误:
+{
+    errno=RET.NODATA,
+    errmsg='无效操作'
+}
+
+
+9/设置用户实名信息
+请求方法:POST
+请求URL:/api/v1.0/user/auth
+数据格式:json
+请求参数:
+参数名         是否必须        参数说明
+real_name       是           用户输入的真实姓名信息
+id_card         是           用户输入的身份证号码
+user_id         是           用户id
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK'
+}
+
+错误:
+{
+    errno=RET.DBERR,
+    errmsg='保存用户实名信息失败'
+}
+
+
+10/获取用户实名信息
+请求方法:GET
+请求URL:/api/v1.0/user/auth
+数据格式:json
+请求参数:user_id = g.user_id
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data=user.auth_to_dict()
+}
+
+错误:
+{
+    errno=RET.NODATA,
+    errmsg='未实名认证'
+}
+
+
+11/获取城区信息
+请求方法:GET
+请求URL:/api/v1.0/areas
+数据格式:json
+请求参数:无参
+返回结果:
+正确:
+areas_list = []
+areas_list = Area.query.all()
+areas_json = json.dumps(areas_list)
+  之前:return jsonify(errno=RET.OK,errmsg='OK',data={'areas':areas_json}
+  resp = '{"errno":0,"errmsg":"OK","data":%s}' % areas_json
+  return resp
+
+错误:
+{
+    errno=RET.NODATA,
+    errmsg='无城区信息'
+}
+
+12/发布新房源
+请求方法:POST
+请求URL:/api/v1.0/houses
+数据格式:json
+请求参数:
+参数名         是否必须        参数描述
+title           是           房屋标题
+price           是           房屋价格
+user_id         是           房屋所属用户(房东)
+area_id         是           房屋所属区域
+address         是           房屋详细地址
+room_count      是           房屋数目
+acreage         是           房屋面积
+unit            是           房屋户型描述
+capacity        是           房屋适住人数
+beds            是           卧床配置
+deposit         是           房屋押金
+min_days        是           最少入住天数
+max_days        是           最大入住天数
+facility        否           房屋配套设施
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data={"house_id":house.id}
+}
+
+错误:
+{
+    errno=RET.DATAERR,
+    errmsg='价格转换异常'
+}
+
+
+13/上传房屋图片
+请求方法:POST
+请求URL:/api/v1.0/houses/<int:house_id>/images
+数据格式:json
+请求参数:
+参数名         是否必须        参数说明
+house_id         是          房屋id
+house_image      是          房屋图片文件
+
+返回结果:
+正确:image_url = 七牛空间外链域名 + 七牛云返回的文件名
+{
+    errno=RET.OK,
+    errmsg='OK,
+    data={'url':image_url}
+}
+
+错误:
+{
+    errno=RET.THIRDERR,
+    errmsg='上传图片失败'
+}
+
+
+14/获取用户发布的房屋
+请求方法:GET
+请求URL:/api/v1.0/user/houses
+数据格式:json
+请求参数:user_id = g.user_id
+参数名         是否必须        参数说明
+user_id         是           用户id
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data={'houses':houses_list}
+}
+
+错误:
+{
+    errno=RET.DBERR,
+    errmsg='查询用户房屋信息异常'
+}
+
+
+15/检查用户登陆状态
+请求方法:GET
+请求URL:/api/v1.0/session
+数据格式:json
+请求参数:无参数
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='true'
+    data={'name':name}
+}
+
+错误:
+{
+    errno=RET.SESSIONERR,
+    errmsg='false'
+}
+
+
+16/项目首页信息展示
+请求方法:GET
+请求URL:/api/v1.0/houses/index
+数据格式:json
+请求参数:无参
+返回结果:
+正确:
+    之前:return jsonify(errno=RET.OK,errmsg='OK',data={'houses':houses_json})
+    示例:return '{"errno":0,"errmsg":"OK","data":%s}' % houses_json
+
+错误:
+{
+    errno=RET.DBERR,
+    errmsg='查询房屋信息异常
+}
+
+
+17/房屋详情页面
+请求方法:GET
+请求URL:/api/v1.0/houses/<int:house_id>
+数据格式:json
+请求参数:
+参数名         是否必须        参数描述
+user_id         是           用户身份id
+house_id        是           房屋id
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data={"user_id":user_id,"house":house_json}
+}
+错误:
+{
+    errno=RET.NODATA,
+    errmsg='无房屋数据'
+}
+
+
+18/房屋列表页
+请求方法:GET
+请求URL:/api/v1.0/houses
+数据格式:json
+请求参数:
+参数名             是否必须        参数说明
+area_id             否           区域信息('aid','')
+start_date_str      否           用户选择的开始日期('sd','')
+end_date_str        否           用户选择的结束日期('ed','')
+sort_key            否           排序条件('sk','new')
+page                否           页数('p','1')
+
+
+返回结果:
+正确:
+{
+    errno=RET.OK,
+    errmsg='OK',
+    data={"houses":houses_json,"total_page":total_page,"current_page":page}
+}
+
+错误:
+{
+    errno=RET.DATAERR,
+    errmsg='日期格式错误'
+}
+
+
+
+
+

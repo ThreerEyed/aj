@@ -184,6 +184,13 @@ def user_search():
     return jsonify(code=status_code.OK, houses=hlist, areas=area_dict_list)
 
 
+# 搜索接口
+@user_blueprint.route('/index_search/', methods=['GET'])
+def index_search():
+
+    return jsonify()
+
+
 @user_blueprint.route('/user_index/', methods=['GET'])
 @is_login
 def user_index():

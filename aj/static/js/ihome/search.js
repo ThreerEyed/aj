@@ -160,7 +160,17 @@ $(document).ready(function(){
             $(this).siblings("li").removeClass("active");
             $(".filter-title-bar>.filter-title").eq(2).children("span").eq(0).html($(this).html());
         }
+    });
+
+});
+
+$(document).ready(function () {
+    var search_info = decodeURI(document.location.search);
+    alert(search_info);
+    $.get('/user/index_search/', function (data) {
+        alert('1')
     })
+<<<<<<< HEAD
 });
 
 
@@ -192,4 +202,6 @@ $(document).ready(function(){
             $('.filter-area').html(filter_area)
         }
     });
+=======
+>>>>>>> fe3bf790791fd485df620604366bad121d1f8b45
 });
