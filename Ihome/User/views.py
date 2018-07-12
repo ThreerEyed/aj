@@ -1,3 +1,4 @@
+import random
 import re
 
 import redis as redis
@@ -6,6 +7,7 @@ from werkzeug.security import generate_password_hash
 
 from User.models import User, db
 from utils import statucode
+from utils.captcha import sms
 from utils.captcha.captcha import captcha
 
 user = Blueprint('user', __name__)
@@ -101,9 +103,42 @@ def send_sms_code():
     if image_code.lower() != text.lower():
         return jsonify({'code': 200, 'msg': statucode.IMAGE_CODE_ERROR})
 
+    # 发送手机验证码
+    sms_code = random.randint(100000, 999999)
+    try:
+        redis_store.setex('SMSCode_' + phone, 300, sms_code)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(statucode.MESAGE_SAVE_DEFATE)
+        # 写注册的时候在使用
+        # # 判断用户是否已注册
+        # try:
+        #     user = User.query.filter_by(mobile=mobile).first()
+        # except Exception as e:
+        #     current_app.logger.error(e)
+        #     return jsonify(errno=RET.DBERR,errmsg='查询用户信息异常')
+        # else:
+        #     # 判断查询结果，用户是否注册
+        #     if user is not None:
+        #         return jsonify(errno=RET.DATAEXIST, errmsg='手机号已注册')
+
+        # 发送短信，调用云通讯接口
+    mesage = "您的验证码是：%s。请不要把验证码泄露给其他人。" % sms_code
+    try:
+        # 实例化对象
+        result = sms.send_sms(phone, mesage)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(statucode.MESAGE_SEND_DEFATE)
+        # 判断发送结果
+        # if result ==0:
+        # 表达式判断，变量写在后面
+    if 0 == result:
+        return jsonify({'code': 200, 'msg': statucode.MESAGE_SEND_SUCCESS})
+
 
 # 注册提交信息然后返回接口的页面
-@user.route('/register/', methods=['POST'])
+@user.route('/registers/', methods=['POST'])
 def register_count():
     # 提交的所有信息
     phone = request.form.get('mobile')
@@ -136,8 +171,12 @@ def register_count():
     # 密码加密
     user_register.pw_hash = generate_password_hash(pwd)
 
-    db.session.add(user_register)
-    db.session.commit()
+    try:
+        db.session.add(user_register)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(statucode.DATABASE_ERROR)
 
     return redirect(url_for('user.login', user=user_register))
 
