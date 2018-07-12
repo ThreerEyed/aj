@@ -23,7 +23,7 @@ function generateImageCode() {
     imageCodeId = generateUUID();
 
     // 设置页面中图片验证码img标签的src属性
-    var imageCodeUrl = "/api/v1.0/imagecode/" + imageCodeId;
+    var imageCodeUrl = "/user/imagecode/" + imageCodeId;
     $(".image-code>img").attr("src", imageCodeUrl);
 }
 
@@ -49,16 +49,17 @@ function sendSMSCode() {
     // 通过ajax方式向后端接口发送请求，让后端发送短信验证码
     var req = {
         text: imageCode, // 用户填写的图片验证码
-        id: imageCodeId // 图片验证码的编号
+        id: imageCodeId, // 图片验证码的编号
+        phone: mobile
     }
     //json.dumps(),json.loads()
     //JSON.stringify(),JSON.parse()
     // $.get(url,data,funciont())
     // $.post(url,data,type=xml/json/str,function())
     // $.ajax()可以实现更精确的控制。
-    $.get("/api/v1.0/smscode/"+mobile, req, function (resp) {
+    $.get("/user/smscode/", req, function (resp) {
         // 表示后端发送短信成功
-        if (resp.errno == "0") {
+        if (resp.code == 200) {
             // 倒计时60秒，60秒后允许用户再次点击发送短信验证码的按钮
             var num = 60;
             // 设置一个计时器
@@ -166,4 +167,4 @@ $(document).ready(function() {
             }
         });
     });
-})
+});

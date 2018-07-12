@@ -17,7 +17,6 @@ def html_file(file_name):
     if file_name != "favicon.ico":
         file_name = "html/" + file_name
 
-
     csrf_token = csrf.generate_csrf()
     response = make_response(current_app.send_static_file(file_name))
 
