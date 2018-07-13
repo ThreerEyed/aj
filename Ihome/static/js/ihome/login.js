@@ -26,30 +26,31 @@ $(document).ready(function() {
             return;
         }
         // 将表单的数据存放到对象data中
-        var data = {};
-        $(this).serializeArray().map(function(x){data[x.name] = x.value;});
+        var data = {
+            'mobile': mobile,
+            'passwd': passwd
+        };
+        // $(this).serializeArray().map(function(x){data[x.name] = x.value;});
         // 将data转为json字符串
         var jsonData = JSON.stringify(data);
         $.ajax({
-            url:"/api/v1.0/sessions",
+            url:"/user/login/",
             type:"post",
             data: jsonData,//JSON.stringify(data);//dumps,loads//stringify,parse
             contentType: "application/json",
             dataType: "json",
-            headers:{
-                "X-CSRFTOKEN":getCookie("csrf_token"),
-            },
+            // headers:{
+            //     "X-CSRFTOKEN":getCookie("csrf_token"),
+            // },
             success: function (data) {
-                if ("0" == data.errno) {
+                if (1014 == data.code) {
                     // 登录成功，跳转到主页
-                    location.href = "/";
-                    return;
+                    location.href = "/user/show_index/";
                 }
                 else {
                     // 其他错误信息，在页面中展示
-                    $("#password-err span").html(data.errmsg);
+                    $("#password-err span").html(data.msg);
                     $("#password-err").show();
-                    return;
                 }
             }
         });

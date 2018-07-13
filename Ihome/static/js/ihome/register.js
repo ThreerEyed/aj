@@ -37,7 +37,7 @@ function sendSMSCode() {
         $("#mobile-err").show();
         $(".phonecode-a").attr("onclick", "sendSMSCode();");
         return;
-    } 
+    }
     var imageCode = $("#imagecode").val();
     if (!imageCode) {
         $("#image-code-err span").html("请填写验证码！");
@@ -144,21 +144,21 @@ $(document).ready(function() {
 
         // 向后端发送注册请求,$.ajax在需要指定headers的情况下使用。
         $.ajax({
-            url: "/api/v1.0/users",
+            url: "/user/user_register/",
             type: "POST",
             contentType: "application/json",  // 指明发送到后端的数据格式是json
             data: JSON.stringify(req),//parse
-            headers: {
-                "X-CSRFToken": getCookie("csrf_token") // 后端开启了csrf防护，所以前端发送json数据的时候，需要包含这个请求头
-            },
+            // headers: {
+            //     "X-CSRFToken": getCookie("csrf_token") // 后端开启了csrf防护，所以前端发送json数据的时候，需要包含这个请求头
+            // },
             dataType: "json", // 指明后端返回到前端的数据是json格式的
             success: function(resp){
                 if (resp.errno == "0") {
                     // 表示注册成功,跳转到主页
                     location.href = "/index.html";
-                } else if (resp.errno == "4101") {
+                } else if (resp.code == 200) {
                     // 表示用户注册成功，但是用户的登录状态后端未保存，所以跳转到登录页面
-                    location.href = "/login.html";
+                    location.href = "/user/login/";
                 } else {
                     // 在页面中展示错误信息
                     $("#password2-err span").html(resp.errmsg);
@@ -166,5 +166,6 @@ $(document).ready(function() {
                 }
             }
         });
+        return false;
     });
 });

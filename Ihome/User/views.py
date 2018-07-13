@@ -1,9 +1,10 @@
+import os
 import random
 import re
 
 import redis as redis
-from flask import render_template, Blueprint, request, jsonify, redirect, url_for, current_app, make_response
-from werkzeug.security import generate_password_hash
+from flask import render_template, Blueprint, request, jsonify, redirect, url_for, current_app, make_response, session
+from werkzeug.security import generate_password_hash, check_password_hash
 
 from User.models import User, db
 from utils import statucode
@@ -71,7 +72,7 @@ def send_sms_code():
     :param modile:
     :return:
     """
-    phone = request.args.get('mobile')
+    phone = request.args.get('phone')
     text = request.args.get('text')
     uuid = request.args.get('id')
 
@@ -93,15 +94,15 @@ def send_sms_code():
     if not image_code:
         return jsonify(statucode.IMAGE_SAVE_OUT)
 
+    # 比较验证码是否一致
+    if image_code.decode('utf-8').lower() != text.lower():
+        return jsonify(statucode.IMAGE_CODE_ERROR)
+
     # 图片验证码只能获取一次，无论是否获取到，都必须删除图片验证码
     try:
         redis_store.delete('ImageCode_' + uuid)
     except Exception as e:
         current_app.logger.error(e)
-
-    # 比较验证码是否一致
-    if image_code.lower() != text.lower():
-        return jsonify({'code': 200, 'msg': statucode.IMAGE_CODE_ERROR})
 
     # 发送手机验证码
     sms_code = random.randint(100000, 999999)
@@ -126,45 +127,58 @@ def send_sms_code():
     mesage = "您的验证码是：%s。请不要把验证码泄露给其他人。" % sms_code
     try:
         # 实例化对象
-        result = sms.send_sms(phone, mesage)
+        a = sms.send_sms(mesage, phone)
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(statucode.MESAGE_SEND_DEFATE)
         # 判断发送结果
         # if result ==0:
         # 表达式判断，变量写在后面
-    if 0 == result:
-        return jsonify({'code': 200, 'msg': statucode.MESAGE_SEND_SUCCESS})
+
+    return jsonify({'code': 200, 'msg': statucode.MESAGE_SEND_SUCCESS})
 
 
 # 注册提交信息然后返回接口的页面
-@user.route('/registers/', methods=['POST'])
+@user.route('/user_register/', methods=['POST'])
 def register_count():
     # 提交的所有信息
-    phone = request.form.get('mobile')
+    # phone = request.form.get('mobile')
     # imagecode = request.form.get('imagecode')
     # phonecode = request.form.get('phonecode')
-    pwd = request.form.get('password')
-    pwd2 = request.form.get('password2')
+    # pwd = request.form.get('password')
+    # pwd2 = request.form.get('password2')
+
+    data = request.get_json()
+    phone = data.get('mobile')
+    pwd = data.get('password')
+    phonecode = data.get('sms_code')
 
     # 验证信息完整性
-    if not all([phone, pwd, pwd2]):
+    if not all([phone, phonecode, pwd]):
         msg = '请输入完整信息'
         return jsonify(statucode.INFO_IS_NOT_COMPLETE)
 
     reg = re.match('((13[0-9])|(14[5,7])|(15[0-3,5-9])|(17[035-8])|(18[0-9])|166|198|199|(147))\\d{8}', phone)
     # 验证数据有效性
     if not reg:
-        msg = '请输入正确的手机号码'
         return jsonify(statucode.PHONE_NUMBER_IS_INVALID)
-    # 验证图片验证码
-    # 验证手机验证码
-    # 验证密码是否一致
-    if pwd != pwd2:
-        msg = '两次密码输入不一致'
-        return jsonify(statucode.PASSWORD_ERROR)
 
-    # 保存数据到数据库
+    # 验证用户是否已存在
+    if User.object.filter_by(phone=phone).first():
+        return jsonify(statucode.USER_EXISTS)
+
+    # 验证图片验证码
+    # if not imagecode:
+    #     return jsonify(statucode.IMAGE_CODE_ERROR)
+    # 验证手机验证码
+    phone_code = redis_store.get('SMSCode_' + phone)
+    if phonecode != phone_code.decode('utf-8'):
+        return jsonify(statucode)
+
+    # 删除数据库中用户的短信信息
+    redis_store.delete('SMSCode_' + phone)
+
+    # 保存用户数据到数据库
     user_register = User()
     user_register.name = phone
     user_register.phone = phone
@@ -178,12 +192,181 @@ def register_count():
         db.session.rollback()
         return jsonify(statucode.DATABASE_ERROR)
 
-    return redirect(url_for('user.login', user=user_register))
+    return jsonify(statucode.COUNT_REGISTER_SUCCESS)
 
 
+# 登录页面展示
 @user.route('/login/', methods=['GET'])
 def login():
     return render_template('login.html')
 
 
+# 登录接口
+@user.route('/login/', methods=['POST'])
+def user_login():
+    data = request.get_json()
+    phone = data.get('mobile')
+    pwd = data.get('passwd')
+
+    if User.query.filter_by(phone=phone).first():
+        a_user = User.query.filter_by(phone=phone).first()
+        if check_password_hash(a_user.pw_hash, pwd):
+            session['user_id'] = a_user.id
+            session['phone'] = phone
+            return jsonify(statucode.LOGIN_SUCCESS)
+        else:
+            return jsonify(statucode.USER_PASSWORD_ERROR)
+    else:
+        return jsonify(statucode.USER_NOT_EXISTS)
+
+
+# 退出接口
+@user.route('/logout/', methods=['delete'])
+def logout():
+    session.clear()
+    return jsonify({'code': statucode.OK})
+
+
+# 首页展示
+@user.route('/show_index/', methods=['GET'])
+def show_index():
+    return render_template('index.html')
+
+
+@user.route('/index/', methods=['GET'])
+def index():
+    user_id = session['user_id']
+    a_user = User.query.filter_by(id=user_id).first()
+    data = {
+        'id': a_user.id,
+        'phone': a_user.phone
+    }
+    return jsonify({'code': 200, 'data': data})
+    # return render_template('index.html')
+
+
+# 个人中心
+@user.route('/my/', methods=['GET'])
+def my():
+    return render_template('my.html')
+
+
+# 个人中心接口
+@user.route('/my_info/', methods=['GET'])
+def my_info():
+    a_user = User.query.filter_by(id=session['user_id']).first()
+    data = {
+        'name': a_user.name,
+        'mobile': a_user.phone,
+        'avatar': '/static/upload/' + a_user.avatar
+    }
+    return jsonify({'code': 200, 'data': data})
+
+
+# 修改个人信息
+@user.route('/profile/', methods=['GET'])
+def profile():
+    return render_template('profile.html')
+
+
+# 修改个人信息
+@user.route('/profile/', methods=['PUT'])
+def profile_info():
+    data = request.get_json()
+    name = data.get('name')
+
+    if User.query.filter_by(name=name).first():
+        return jsonify(statucode.USER_EXISTS)
+
+    a_user = User.query.filter_by(id=session.get('user_id')).first()
+    a_user.name = name
+
+    try:
+        db.session.add(a_user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(statucode.DATABASE_ERROR)
+    return jsonify({'code': statucode.OK})
+
+
+# 展示个人信息
+@user.route('/show_user_info/', methods=['GET'])
+def show_user_info():
+
+    if not session['user_id']:
+        return jsonify(statucode.USER_NO_LOGIN)
+    a_user = User.query.filter_by(id=session['user_id']).first()
+    data = {
+        'avatar': '/static/upload/' + a_user.avatar,
+        'name': a_user.name
+    }
+    return jsonify({'code': statucode.OK, 'data': data})
+
+
+# 头像上传
+@user.route('/avatar/', methods=['POST'])
+def avatar():
+    file = request.files.get('avatar')
+    # 先验证上传的是否是图片文件, 不是图片文件的返回
+    if not re.match(r'image/*', file.mimetype):
+        return jsonify(statucode.IMAGE_TYPE_ERROR)
+
+    # 保存图片文件
+    BASEDIR = os.path.dirname(os.path.dirname(__file__))
+    filename = file.filename
+    filepath = os.path.join(BASEDIR, 'static/upload', filename)
+    file.save(filepath)
+
+    a_user = User.query.filter_by(id=session['user_id']).first()
+    a_user.avatar = file.filename
+
+    try:
+        db.session.add(a_user)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return jsonify(statucode.DATABASE_ERROR)
+    data = '/static/upload/' + file.filename
+    return jsonify({'code': 200, 'data': data})
+
+
+# 实名认证
+@user.route('/show_auth/', methods=['GET'])
+def show_auth():
+    return render_template('auth.html')
+
+
+# 实名认证接口
+@user.route('/auth/', methods=['GET'])
+def auth_():
+    a_user = User.query.filter_by(id=session['user_id']).first()
+    real_name = a_user.id_name
+    id_card = a_user.id_card
+
+    data = {
+        'real_name': real_name,
+        'id_card': id_card
+    }
+    return jsonify({'code': 200, 'data': data})
+
+
+@user.route('/auth/', methods=['POST'])
+def auth():
+    data = request.get_json()
+    real_name = data['real_name']
+    id_card = data['id_card']
+
+    a_user = User.query.filter_by(id=session['user_id']).first()
+    a_user.id_name = real_name
+    a_user.id_card = id_card
+
+    try:
+        db.session.add(a_user)
+        db.session.commit()
+    except:
+        db.session.rollback()
+        return jsonify(statucode.DATABASE_ERROR)
+
+    return jsonify({'code': 200})
 

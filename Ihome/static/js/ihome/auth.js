@@ -14,12 +14,12 @@ function getCookie(name) {
 
 $(document).ready(function(){
     // 查询用户的实名认证信息
-    $.get("/api/v1.0/user/auth", function(resp){
+    $.get("/user/auth/", function(resp){
         // 4101代表用户未登录
         if ("4101" == resp.errno) {
-            location.href = "/login.html";
+            location.href = "/user/login/";
         }
-        else if ("0" == resp.errno) {
+        else if (200 == resp.code) {
             // 如果返回的数据中real_name与id_card不为null，表示用户有填写实名信息
             if (resp.data.real_name && resp.data.id_card) {
                 $("#real-name").val(resp.data.real_name);
@@ -48,16 +48,16 @@ $(document).ready(function(){
 
         // 向后端发送请求
         $.ajax({
-            url:"/api/v1.0/user/auth",
+            url:"/user/auth/",
             type:"post",
             data: jsonData,
             contentType: "application/json",
             dataType: "json",
-            headers: {
-                "X-CSRFTOKEN": getCookie("csrf_token")
-            },
+            // headers: {
+            //     "X-CSRFTOKEN": getCookie("csrf_token")
+            // },
             success: function (resp) {
-                if (0 == resp.errno) {
+                if (200 == resp.code) {
                     $(".error-msg").hide();
                     // 显示保存成功的提示信息
                     showSuccessMsg();

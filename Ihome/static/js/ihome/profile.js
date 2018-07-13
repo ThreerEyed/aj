@@ -13,13 +13,13 @@ function getCookie(name) {
 
 $(document).ready(function () {
     // 在页面加载是向后端查询用户的信息
-    $.get("/api/v1.0/user", function(resp){
+    $.get("/user/show_user_info/", function(resp){
         // 用户未登录
-        if ("4101" == resp.errno) {
-            location.href = "/login.html";
+        if ("1015" == resp.code) {
+            location.href = "/user/login/";
         }
         // 查询到了用户的信息
-        else if ("0" == resp.errno) {
+        else if (200 == resp.code) {
             $("#user-name").val(resp.data.name);
             if (resp.data.avatar) {
                 $("#user-avatar").attr("src", resp.data.avatar);
@@ -32,25 +32,25 @@ $(document).ready(function () {
         // 禁止浏览器对于表单的默认行为
         e.preventDefault();
         $(this).ajaxSubmit({
-            url: "/api/v1.0/user/avatar",
+            url: "/user/avatar/",
             type: "post",
-            headers: {
-                "X-CSRFToken": getCookie("csrf_token"),
-            },
+            // headers: {
+            //     "X-CSRFToken": getCookie("csrf_token"),
+            // },
             dataType: "json",
             success: function (resp) {
-                if (resp.errno == "0") {
+                if (resp.code == 200) {
                     // 表示上传成功， 将头像图片的src属性设置为图片的url
-                    $("#user-avatar").attr("src", resp.data.avatar_url);
+                    $("#user-avatar").attr("src", resp.data);
                 } else if (resp.errno == "4101") {
                     // 表示用户未登录，跳转到登录页面
-                    location.href = "/login.html";
+                    location.href = "/user/login/";
                 } else {
                     alert(resp.errmsg);
                 }
             }
         });
-
+        return false;
     });
     $("#form-name").submit(function(e){
         e.preventDefault();
@@ -62,25 +62,28 @@ $(document).ready(function () {
             return;
         }
         $.ajax({
-            url:"/api/v1.0/user/name",
+            url:"/user/profile/",
             type:"PUT",
             data: JSON.stringify({name: name}),
             contentType: "application/json",
             dataType: "json",
-            headers:{
-                "X-CSRFTOKEN":getCookie("csrf_token")
-            },
+            // headers:{
+            //     "X-CSRFTOKEN":getCookie("csrf_token")
+            // },
             success: function (data) {
-                if ("0" == data.errno) {
+                if (200 == data.code) {
                     $(".error-msg").hide();
                     showSuccessMsg();
-                } else if ("4001" == data.errno) {
+                } else if (1011 == data.code) {
                     $(".error-msg").show();
                 } else if ("4101" == data.errno) {
-                    location.href = "/login.html";
+                    location.href = "/user/login/";
+                } else if (0 == data.code){
+                    $('.error-msg').show();
                 }
             }
         });
+        return false;
     })
 })
 

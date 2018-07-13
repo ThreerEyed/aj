@@ -6,28 +6,28 @@ function getCookie(name) {
 // 点击推出按钮时执行的函数
 function logout() {
     $.ajax({
-        url: "/api/v1.0/session",
+        url: "/user/logout/",
         type: "delete",
-        headers: {
-            "X-CSRFToken": getCookie("csrf_token")
-        },
+        // headers: {
+        //     "X-CSRFToken": getCookie("csrf_token")
+        // },
         dataType: "json",
         success: function (resp) {
-            if ("0" == resp.errno) {
-                location.href = "/index.html";
+            if (200 == resp.code) {
+                location.href = "/user/login/";
             }
         }
     });
 }
 
 $(document).ready(function(){
-    $.get("/api/v1.0/user", function(resp){
+    $.get("/user/my_info/", function(resp){
         // 用户未登录
         if ("4101" == resp.errno) {
-            location.href = "/login.html";
+            location.href = "/user/login/";
         }
         // 查询到了用户的信息
-        else if ("0" == resp.errno) {
+        else if (200 == resp.code) {
             $("#user-name").html(resp.data.name);
             $("#user-mobile").html(resp.data.mobile);
             if (resp.data.avatar) {
