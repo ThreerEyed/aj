@@ -135,7 +135,7 @@ def send_sms_code():
         # if result ==0:
         # 表达式判断，变量写在后面
 
-    return jsonify({'code': 200, 'msg': statucode.MESAGE_SEND_SUCCESS})
+    return jsonify({'code': statucode.OK, 'msg': statucode.MESAGE_SEND_SUCCESS})
 
 
 # 注册提交信息然后返回接口的页面
@@ -164,7 +164,7 @@ def register_count():
         return jsonify(statucode.PHONE_NUMBER_IS_INVALID)
 
     # 验证用户是否已存在
-    if User.object.filter_by(phone=phone).first():
+    if User.query.filter_by(phone=phone).first():
         return jsonify(statucode.USER_EXISTS)
 
     # 验证图片验证码
@@ -235,14 +235,16 @@ def show_index():
 
 @user.route('/index/', methods=['GET'])
 def index():
-    user_id = session['user_id']
-    a_user = User.query.filter_by(id=user_id).first()
-    data = {
-        'id': a_user.id,
-        'phone': a_user.phone
-    }
-    return jsonify({'code': 200, 'data': data})
-    # return render_template('index.html')
+    user_id = session.get('user_id')
+    if user_id:
+        a_user = User.query.filter(User.id == user_id).first()
+        data = {
+            'id': a_user.id,
+            'phone': a_user.phone
+        }
+        return jsonify({'code': statucode.OK, 'data': data})
+        # return render_template('index.html')
+    return jsonify()
 
 
 # 个人中心
@@ -255,12 +257,13 @@ def my():
 @user.route('/my_info/', methods=['GET'])
 def my_info():
     a_user = User.query.filter_by(id=session['user_id']).first()
+    user_image = a_user.avatar if a_user.avatar else 'landlord01.jpg'
     data = {
         'name': a_user.name,
         'mobile': a_user.phone,
-        'avatar': '/static/upload/' + a_user.avatar
+        'avatar': '/static/upload/' + user_image
     }
-    return jsonify({'code': 200, 'data': data})
+    return jsonify({'code': statucode.OK, 'data': data})
 
 
 # 修改个人信息
@@ -328,7 +331,7 @@ def avatar():
         db.session.rollback()
         return jsonify(statucode.DATABASE_ERROR)
     data = '/static/upload/' + file.filename
-    return jsonify({'code': 200, 'data': data})
+    return jsonify({'code': statucode.OK, 'data': data})
 
 
 # 实名认证
@@ -348,7 +351,7 @@ def auth_():
         'real_name': real_name,
         'id_card': id_card
     }
-    return jsonify({'code': 200, 'data': data})
+    return jsonify({'code': statucode.OK, 'data': data})
 
 
 @user.route('/auth/', methods=['POST'])
@@ -368,5 +371,5 @@ def auth():
         db.session.rollback()
         return jsonify(statucode.DATABASE_ERROR)
 
-    return jsonify({'code': 200})
+    return jsonify({'code': statucode.OK})
 

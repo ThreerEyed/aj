@@ -4,10 +4,12 @@ import redis
 from flask import Flask
 from flask_session import Session
 
+from User.house_views import house
 from User.models import db
 from User.views import user
 
 se = Session()
+
 
 def create_app():
     """
@@ -38,6 +40,7 @@ def create_app():
     PERMANENT_SESSION_LIFETIME = 86400  # session数据的有效期秒
 
     app.register_blueprint(blueprint=user, url_prefix='/user')
+    app.register_blueprint(blueprint=house, url_prefix='/house')
 
     se.init_app(app=app)
     db.init_app(app=app)
