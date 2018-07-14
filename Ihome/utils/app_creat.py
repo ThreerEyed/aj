@@ -6,6 +6,7 @@ from flask_session import Session
 
 from User.house_views import house
 from User.models import db
+from User.order_views import order_blueprint
 from User.views import user
 
 se = Session()
@@ -41,6 +42,7 @@ def create_app():
 
     app.register_blueprint(blueprint=user, url_prefix='/user')
     app.register_blueprint(blueprint=house, url_prefix='/house')
+    app.register_blueprint(blueprint=order_blueprint, url_prefix='/order')
 
     se.init_app(app=app)
     db.init_app(app=app)

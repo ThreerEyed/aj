@@ -27,3 +27,14 @@ DATABASE_ERROR = {'code': 0, 'msg': '数据库错误'}
 
 # 修改个人信息
 IMAGE_TYPE_ERROR = {'code': 1101, 'msg': '图片格式错误'}
+
+
+# 房屋相关状态码
+PARAMERR = {'code': 1201, 'msg': '参数错误'}
+PARAMERR_MISS = {'code': 1202, 'msg': '参数丢失'}
+PRICE_ERROR = {'code': 1203, 'msg': '价格不正常'}
+SELECT_FACILITY_ERROR = {'code': 1204, 'msg': '查询设施错误'}
+
+HOUSE_EXISTS = {'code': 1205, 'msg': '房源已经存在'}
+
+
