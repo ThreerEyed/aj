@@ -78,9 +78,9 @@ $(document).ready(function(){
             url: "/house/house_images/",
             type: "post",
             data: {'house_id': house_id},
-            headers: {
-                "X-CSRFToken": getCookie("csrf_token")
-            },
+            // headers: {
+            //     "X-CSRFToken": getCookie("csrf_token")
+            // },
             dataType: "json",
             success: function (resp) {
                 if ("4101" == resp.code) {

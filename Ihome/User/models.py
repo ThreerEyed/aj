@@ -31,6 +31,13 @@ class User(BaseModel, db.Model):
     # 用户的密码
     pw_hash = db.Column(db.String(255))
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'avatar': self.avatar,
+            'phone': self.phone
+        }
+
 
 ihome_house_facility = db.Table(
     "ihome_house_facility",

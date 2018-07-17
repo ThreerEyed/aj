@@ -182,13 +182,13 @@ def house_images():
     filepath = os.path.join(BASEDIR, 'static/images', filename)
     file.save(filepath)
     # 判断该房源是否存在
-    if HouseImage.query.filter(HouseImage.house_id == house_id).first():
-        return jsonify(statucode.HOUSE_EXISTS)
+    # if HouseImage.query.filter(HouseImage.house_id == house_id).first():
+    #     return jsonify(statucode.HOUSE_EXISTS)
 
     # 实例化对象并保存图片
     house_image = HouseImage()
     house_image.house_id = house_id
-    house_image.url = filepath
+    house_image.url = filename
 
     a_house = House.query.filter(House.id == house_id).first()
 
@@ -197,8 +197,9 @@ def house_images():
         a_house.index_image_url = '/static/images/' + file.filename
 
     # 将上传的房屋相关的图片上传到数据库
-    db.session.add(a_house)
+
     try:
+        db.session.add_all([a_house, house_image])
         db.session.commit()
     except Exception as e:
         db.session.rollback()
@@ -208,3 +209,29 @@ def house_images():
     return jsonify({'code': 200, 'url': '/static/images/' + filename})
 
 
+# 房屋细节页面展示
+@house.route('/detail/', methods=['GET'])
+def show_detail():
+    return render_template('detail.html')
+
+
+# 展示房屋细节
+@house.route('/detail/<int:id>', methods=['GET'])
+def detail(id):
+    """
+    传入数据 house.id
+    传到前端的数据 house.img_urls, data.house.price, data.house
+    :return:
+    """
+    image_urls = HouseImage.query.filter(HouseImage.house_id == id).all()
+    houses = House.query.filter(House.id == id).first()
+
+    user = User.query.filter_by(id=houses.user_id).first()
+
+    data = {
+        'urls': [img.url for img in image_urls],
+        'price': [houses.price],
+        'house': [houses.to_dict()],
+        'user': [user.to_dict()]
+    }
+    return jsonify({'code': 200, 'data': data})

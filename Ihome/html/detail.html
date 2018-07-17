@@ -23,22 +23,25 @@
         </div>
         <div class="swiper-container">
         </div>
+        {% raw %}
         <script id="house-image-tmpl" type="text/html">
             <ul class="swiper-wrapper">
                 {{each img_urls as img_url}}
-                <li class="swiper-slide"><img src="{{img_url}}"></li>
+                <li class="swiper-slide"><img src="/static/images/{{img_url}}"></li>
                 {{/each}}
             </ul>
             <div class="swiper-pagination"></div>
             <div class="house-price">￥<span>{{(price/100.0).toFixed(0)}}</span>/晚</div>
         </script>
+        {% endraw %}
         <div class="detail-con">
         </div>
+        {% raw %}
         <script id="house-detail-tmpl" type="text/html">
             <div class="detail-header layout-style">
                 <h2 class="house-title">{{house.title}}</h2>
-                <div class="landlord-pic"><img src="{{house.user_avatar}}"></div>
-                <h2 class="landlord-name">房东： <span>{{house.user_name}}</span></h2>
+                <div class="landlord-pic"><img src="/static/images/{{user.avatar}}"></div>
+                <h2 class="landlord-name">房东： <span>{{user.name}}</span></h2>
             </div>
             <div class="house-info layout-style">
                <h3>房屋地址</h3>
@@ -119,6 +122,7 @@
             </div>
             {{/if}}
         </script>
+        {% endraw %}
         <a class="book-house" href="">即刻预定</a>
         <div class="footer">
             <p><span><i class="fa fa-copyright"></i></span>爱家租房&nbsp;&nbsp;享受家的温馨</p>

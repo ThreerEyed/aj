@@ -18,16 +18,18 @@ $(document).ready(function(){
     var houseId = queryData["id"];
 
     // 获取该房屋的详细信息
-    $.get("/api/v1.0/houses/" + houseId, function(resp){
-        if ("0" == resp.errno) {
-            $(".swiper-container").html(template("house-image-tmpl", {img_urls:resp.data.house.img_urls, price:resp.data.house.price}));
+    $.get("/house/detail/" + houseId, function(resp){
+        if (200 == resp.code) {
+            $(".swiper-container").html(template("house-image-tmpl", {'img_urls':resp.data.urls,
+                'price':resp.data.price, 'user':resp.data.user}));
             $(".detail-con").html(template("house-detail-tmpl", {house:resp.data.house}));
 
+
             // resp.user_id为访问页面用户,resp.data.user_id为房东
-            if (resp.data.user_id != resp.data.house.user_id) {
-                $(".book-house").attr("href", "/booking.html?hid="+resp.data.house.hid);
-                $(".book-house").show();
-            }
+            // if (resp.data.user_id != resp.data.house.user_id) {
+            //     $(".book-house").attr("href", "/booking.html?hid="+resp.data.house.hid);
+            //     $(".book-house").show();
+            // }
             var mySwiper = new Swiper ('.swiper-container', {
                 loop: true,
                 autoplay: 2000,
@@ -37,4 +39,4 @@ $(document).ready(function(){
             });
         }
     })
-})
+});
