@@ -228,10 +228,14 @@ def detail(id):
 
     user = User.query.filter_by(id=houses.user_id).first()
 
+    user_houses = House.query.filter(House.user_id == session.get('user_id')).all()
+
     data = {
         'urls': [img.url for img in image_urls],
-        'price': [houses.price],
-        'house': [houses.to_dict()],
-        'user': [user.to_dict()]
+        'price': houses.price,
+        'house': houses.to_full_dict(),
+        'user': user.to_dict(),
+        'facilities': [facility.to_dict() for facility in houses.facilities],
+        'user_id': session.get('user_id')
     }
     return jsonify({'code': 200, 'data': data})

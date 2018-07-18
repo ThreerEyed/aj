@@ -17,7 +17,9 @@ USER_NOT_EXISTS = {'code': 1012, 'msg': '该用户不存在'}
 USER_PASSWORD_ERROR = {'code': 1013, 'msg': '用户账号或密码错误'}
 LOGIN_SUCCESS = {'code': 1014, 'msg': '登录成功'}
 
+# 用户未登录
 USER_NO_LOGIN = {'code': 1015, 'msg': '用户未登录'}
+USER_NOT_LOGIN = {'errno': 4101}
 
 COUNT_REGISTER_SUCCESS = {'code': 200, 'msg': '账号注册成功，即将自动跳转登录页面'}
 

@@ -21,15 +21,16 @@ $(document).ready(function(){
     $.get("/house/detail/" + houseId, function(resp){
         if (200 == resp.code) {
             $(".swiper-container").html(template("house-image-tmpl", {'img_urls':resp.data.urls,
-                'price':resp.data.price, 'user':resp.data.user}));
-            $(".detail-con").html(template("house-detail-tmpl", {house:resp.data.house}));
+                'price':resp.data.price}));
+            $(".detail-con").html(template("house-detail-tmpl", {house:resp.data.house, 'user':resp.data.user}));
+            $('.house-facility').html(template('facility_list', {facilities: resp.data.facilities}));
 
 
             // resp.user_id为访问页面用户,resp.data.user_id为房东
-            // if (resp.data.user_id != resp.data.house.user_id) {
-            //     $(".book-house").attr("href", "/booking.html?hid="+resp.data.house.hid);
-            //     $(".book-house").show();
-            // }
+            if (resp.data.user_id != resp.data.user_id) {
+                $(".book-house").attr("href", "/booking.html?hid="+resp.data.house.hid);
+                $(".book-house").show();
+            }
             var mySwiper = new Swiper ('.swiper-container', {
                 loop: true,
                 autoplay: 2000,

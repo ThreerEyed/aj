@@ -10,6 +10,7 @@ from User.models import User, db
 from utils import statucode
 from utils.captcha import sms
 from utils.captcha.captcha import captcha
+from utils.decorator import is_login
 
 user = Blueprint('user', __name__)
 redis_store = redis.StrictRedis(host='127.0.0.1', port=6379)
@@ -249,12 +250,14 @@ def index():
 
 # 个人中心
 @user.route('/my/', methods=['GET'])
+@is_login
 def my():
     return render_template('my.html')
 
 
 # 个人中心接口
 @user.route('/my_info/', methods=['GET'])
+@is_login
 def my_info():
     a_user = User.query.filter_by(id=session['user_id']).first()
     user_image = a_user.avatar if a_user.avatar else 'landlord01.jpg'
@@ -268,12 +271,14 @@ def my_info():
 
 # 修改个人信息
 @user.route('/profile/', methods=['GET'])
+@is_login
 def profile():
     return render_template('profile.html')
 
 
 # 修改个人信息
 @user.route('/profile/', methods=['PUT'])
+@is_login
 def profile_info():
     data = request.get_json()
     name = data.get('name')
@@ -295,6 +300,7 @@ def profile_info():
 
 # 展示个人信息
 @user.route('/show_user_info/', methods=['GET'])
+@is_login
 def show_user_info():
 
     if not session['user_id']:
@@ -309,6 +315,7 @@ def show_user_info():
 
 # 头像上传
 @user.route('/avatar/', methods=['POST'])
+@is_login
 def avatar():
     file = request.files.get('avatar')
     # 先验证上传的是否是图片文件, 不是图片文件的返回
@@ -336,12 +343,14 @@ def avatar():
 
 # 实名认证
 @user.route('/show_auth/', methods=['GET'])
+@is_login
 def show_auth():
     return render_template('auth.html')
 
 
 # 实名认证接口
 @user.route('/auth/', methods=['GET'])
+@is_login
 def auth_():
     a_user = User.query.filter_by(id=session['user_id']).first()
     real_name = a_user.id_name
@@ -355,6 +364,7 @@ def auth_():
 
 
 @user.route('/auth/', methods=['POST'])
+@is_login
 def auth():
     data = request.get_json()
     real_name = data['real_name']
