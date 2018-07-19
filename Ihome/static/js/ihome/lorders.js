@@ -29,9 +29,9 @@ $(document).ready(function(){
             $(".modal-accept").on("click", function(){
                 var orderId = $(this).attr("order-id");
                 $.ajax({
-                    url:"/api/v1.0/orders/"+orderId+"/status",
+                    url:"/order/deal_order/"+orderId+"/status",
                     type:"PUT",
-                    data:'{"action":"accept"}',
+                    data:'{"action":"待评价"}',
                     contentType:"application/json",
                     dataType:"json",
                     headers:{
@@ -39,8 +39,8 @@ $(document).ready(function(){
                     },
                     success:function (resp) {
                         if ("4101" == resp.errno) {
-                            location.href = "/login.html";
-                        } else if ("0" == resp.errno) {
+                            location.href = "/user/login/";
+                        } else if (200 == resp.code) {
                             $(".orders-list>li[order-id="+ orderId +"]>div.order-content>div.order-text>ul li:eq(4)>span").html("已接单");
                             $("ul.orders-list>li[order-id="+ orderId +"]>div.order-title>div.order-operate").hide();
                             $("#accept-modal").modal("hide");
@@ -58,11 +58,11 @@ $(document).ready(function(){
                 var reject_reason = $("#reject-reason").val();
                 if (!reject_reason) return;
                 var data = {
-                    action: "reject",
+                    action: "已拒单",
                     reason:reject_reason
                 };
                 $.ajax({
-                    url:"/api/v1.0/orders/"+orderId+"/status",
+                    url:"/order/deal_order/"+orderId+"/status",
                     type:"PUT",
                     data:JSON.stringify(data),
                     contentType:"application/json",
@@ -71,9 +71,9 @@ $(document).ready(function(){
                     },
                     dataType:"json",
                     success:function (resp) {
-                        if ("4101" == resp.errno) {
+                        if ("4101" == resp.code) {
                             location.href = "/login.html";
-                        } else if ("0" == resp.errno) {
+                        } else if (200 == resp.code) {
                             $(".orders-list>li[order-id="+ orderId +"]>div.order-content>div.order-text>ul li:eq(4)>span").html("已拒单");
                             $("ul.orders-list>li[order-id="+ orderId +"]>div.order-title>div.order-operate").hide();
                             $("#reject-modal").modal("hide");

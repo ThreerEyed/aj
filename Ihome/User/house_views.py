@@ -239,3 +239,59 @@ def detail(id):
         'user_id': session.get('user_id')
     }
     return jsonify({'code': 200, 'data': data})
+
+
+# 首页房屋信息返回接口
+@house.route('/index/', methods=['GET'])
+def index():
+
+    houses = House.query.all()
+    display_houses = houses[:5] if len(houses) > 5 else houses
+    data = [a_house.to_full_dict() for a_house in display_houses]
+    return jsonify({'code': statucode.OK, 'data': data})
+
+
+# 区域信息返回接口
+@house.route('/areas/', methods=['GET'])
+def show_area():
+
+    all_area = Area.query.all()
+    data = {
+        'areas': [area.to_dict() for area in all_area]
+    }
+    return jsonify({'code': 200, 'data': data})
+
+
+# 返回搜索页面
+@house.route('/search/', methods=['GET'])
+def show_search():
+
+    return render_template('search.html')
+
+
+# 搜索页面的区域显示接口返回
+@house.route('/search_area/', methods=['GET'])
+def search_area():
+    all_area = Area.query.all()
+
+    return jsonify({'code': 200, 'data': [area.to_dict() for area in all_area]})
+
+
+# 搜索页面的房屋的接口
+@house.route('/search_houses/', methods=['GET'])
+def search_houses():
+    # 先接受所有的参数
+    all_data = request.args.to_dict()
+    # 需要查询的开始时间
+    start_data = all_data.get('sd')
+    # 需要查询的结束时间
+    end_data = all_data.get('ed')
+    # 需要传递过去的排序的内容
+    sort_key = all_data.get('sk')
+    # 所有符合区域id的 房屋
+    all_house = House.query.filter(House.area_id == all_data.get('aid')).all()
+
+    data ={
+        'houses': [house.to_full_dict() for house in all_house]
+    }
+    return jsonify({'code': 200, 'data': data})

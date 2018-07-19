@@ -27,7 +27,7 @@ $(document).ready(function(){
             });
             $(".modal-comment").on("click", function(){
                 var orderId = $(this).attr("order-id");
-                var comment = $("#comment").val()
+                var comment = $("#comment").val();
                 if (!comment) return;
                 var data = {
                     order_id:orderId,

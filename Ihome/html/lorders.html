@@ -30,7 +30,7 @@
                 <li order-id={{order.order_id}}>
                     <div class="order-title">
                         <h3>订单编号：{{order.order_id}}</h3>
-                        {{ if "WAIT_ACCEPT" == order.status }}
+                        {{ if "待接单" == order.status }}
                         <div class="fr order-operate">
                             <button type="button" class="btn btn-success order-accept" data-toggle="modal" data-target="#accept-modal">接单</button>
                             <button type="button" class="btn btn-danger order-reject" data-toggle="modal" data-target="#reject-modal">拒单</button>
@@ -38,30 +38,30 @@
                         {{/if}}
                     </div>
                     <div class="order-content">
-                        <img src="{{order.img_url}}">
+                        <img src="{{order.image}}">
                         <div class="order-text">
-                            <h3>{{order.title}}</h3>
+                            <h3>{{order.house_title}}</h3>
                             <ul>
-                                <li>创建时间：{{order.ctime}}</li>
-                                <li>入住日期：{{order.start_date}}</li>
+                                <li>创建时间：{{order.create_date}}</li>
+                                <li>入住日期：{{order.begin_date}}</li>
                                 <li>离开日期：{{order.end_date}}</li>
                                 <li>合计金额：￥{{(order.amount/100.0).toFixed(0)}}(共{{order.days}}晚)</li>
                                 <li>订单状态：
                                     <span>
-                                        {{if "WAIT_ACCEPT" == order.status}}
+                                        {{if "待接单" == order.status}}
                                             待接单
-                                        {{else if "WAIT_COMMENT" == order.status}}
+                                        {{else if "待评价" == order.status}}
                                             待评价
-                                        {{else if "COMPLETE" == order.status}}
+                                        {{else if "已完成" == order.status}}
                                             已完成
-                                        {{else if "REJECTED" == order.status}}
+                                        {{else if "已拒单" == order.status}}
                                             已拒单
                                         {{/if}}
                                     </span>
                                 </li>
-                                {{if "COMPLETE" == order.status}}
+                                {{if "已完成" == order.status}}
                                 <li>我的评价： {{order.comment}}</li>
-                                {{else if "REJECTED" == order.status}}
+                                {{else if "已拒单" == order.status}}
                                 <li>拒单原因： {{order.comment}}</li>
                                 {{/if}}
                             </ul>

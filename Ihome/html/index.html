@@ -26,16 +26,17 @@
         <div class="swiper-container">
             <div class="swiper-wrapper">
             </div>
+            {% raw %}
             <script id="swiper-houses-tmpl" type="text/html">
-{#                {{each houses as house}}#}
+                {{each houses as house}}
                 <div class="swiper-slide">
-{#                    <a href="/detail.html?id={{house.house_id}}"><img src="{{house.img_url}}"></a>#}
-                    <a href=""><img src=""></a>
-{#                    <div class="slide-title">{{house.title}}</div>#}
+                    <a href="/house/detail/?id={{house.id}}"><img src="{{house.index_image_url}}"></a>
+                    <div class="slide-title">{{house.title}}</div>
                     <div class="slide-title"></div>
                 </div>
-{#                {{/each}}#}
+                {{/each}}
             </script>
+            {% endraw %}
             <div class="swiper-pagination"></div>
         </div>
         <div class="search-bar">
@@ -53,12 +54,13 @@
                         <div class="modal-body">
                             <div class="area-list">
                             </div>
+                            {% raw %}
                             <script id="area-list-tmpl" type="text/html">
-{#                            {{each areas as area}}#}
-{#                                <a href="#" area-id="{{area.aid}}">{{area.aname}}</a>#}
-                                <a href="#" area-id=""></a>
-{#                            {{/each}}#}
+                            {{each areas as area}}
+                                <a href="#" area-id="{{area.id}}">{{area.name}}</a>
+                            {{/each}}
                             </script>
+                            {% endraw %}
                         </div>
                     </div>
                 </div>

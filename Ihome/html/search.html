@@ -17,7 +17,7 @@
         <div class="top-bar">
             <div class="nav-bar">
                 <h3 class="page-title">房 源</h3>
-                <a class="nav-btn fl" href="/"><span><i class="fa fa-angle-left fa-2x"></i></span></a>
+                <a class="nav-btn fl" href="{{ url_for('user.show_index') }}"><span><i class="fa fa-angle-left fa-2x"></i></span></a>
             </div>
             <ul class="filter-title-bar">
                 <li class="filter-title">
@@ -56,12 +56,12 @@
         <div class="display-mask"></div>
         <ul class="house-list">
         </ul>
+        {% raw %}
         <script id="house-list-tmpl" type="text/html">
             {{each houses as house}}
             <li class="house-item">
-                <a href="/detail.html?id={{house.house_id}}"><img src="{{house.img_url}}"></a>
+                <a href="/house/detail/?id={{house.id}}"><img src="{{house.index_image_url}}"></a>
                 <div class="house-desc">
-                    <div class="landlord-pic"><img src="{{house.user_avatar}}"></div>
                     <div class="house-price">￥<span>{{(house.price/100.0).toFixed(0)}}</span>/晚</div>
                     <div class="house-intro">
                         <span class="house-title">{{house.title}}</span>
@@ -71,6 +71,7 @@
             </li>
             {{/each}}
         </script>
+        {% endraw %}
         <div class="footer">
             <p><span><i class="fa fa-copyright"></i></span>爱家租房&nbsp;&nbsp;享受家的温馨</p>
         </div>

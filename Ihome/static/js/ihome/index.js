@@ -44,7 +44,7 @@ function setEndDate() {
 }
 
 function goToSearchPage(th) {
-    var url = "/search.html?";
+    var url = "/house/search/?";
     url += ("aid=" + $(th).attr("area-id"));
     url += "&";
     var areaName = $(th).attr("area-name");
@@ -69,8 +69,8 @@ $(document).ready(function(){
     }, "json");
 
     // 获取幻灯片要展示的房屋基本信息
-    $.get("/api/v1.0/houses/index", function(resp){
-        if ("0" == resp.errno) {
+    $.get("/house/index/", function(resp){
+        if (200 == resp.code) {
             $(".swiper-wrapper").html(template("swiper-houses-tmpl", {houses:resp.data}));
 
             // 设置幻灯片对象，开启幻灯片滚动
@@ -85,9 +85,9 @@ $(document).ready(function(){
     });
 
     // 获取城区信息
-    $.get("/api/v1.0/areas", function(resp){
-        if ("0" == resp.errno) {
-            $(".area-list").html(template("area-list-tmpl", {areas:resp.data}));
+    $.get("/house/areas/", function(resp){
+        if (200 == resp.code) {
+            $(".area-list").html(template("area-list-tmpl", {areas:resp.data.areas}));
 
             $(".area-list a").click(function(e){
                 $("#area-btn").html($(this).html());
